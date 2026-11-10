@@ -6,17 +6,24 @@ import torch.optim as optim
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import StandardScaler
 
+# Reproducibility
+torch.manual_seed(42)
+np.random.seed(42)
+
 # 1. Load and prepare data
 df = pd.read_csv("network_intrusion.csv")
 X = df.drop("is_attack", axis=1).values
 y = df["is_attack"].values.reshape(-1, 1)
 
-# Scale features
-scaler = StandardScaler()
-X = scaler.fit_transform(X)
-
 # Train/test split
-X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42, stratify=y
+)
+
+# Scale features (fit on train only to avoid data leakage)
+scaler = StandardScaler()
+X_train = scaler.fit_transform(X_train)
+X_test = scaler.transform(X_test)
 
 # Convert to tensors
 X_train = torch.tensor(X_train, dtype=torch.float32)

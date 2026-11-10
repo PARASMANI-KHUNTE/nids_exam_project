@@ -26,6 +26,7 @@ core_features = [
     'srv_count', 'serror_rate', 'srv_serror_rate', 'same_srv_rate', 'dst_host_srv_count'
 ]
 
+
 def download_nsl_kdd():
     """Download NSL-KDD 20% dataset from GitHub"""
     url = "https://raw.githubusercontent.com/jmnwong/NSL-KDD-Dataset/master/KDDTrain%2B_20Percent.txt"
@@ -40,6 +41,7 @@ def download_nsl_kdd():
         print(f"Download failed: {e}")
         return None
 
+
 def load_kddcup99_fallback():
     """Fallback: Load KDD Cup 99 dataset from sklearn"""
     print("Using sklearn fallback: fetch_kddcup99(percent10=True)...")
@@ -49,26 +51,39 @@ def load_kddcup99_fallback():
     print(f"Loaded fallback dataset! Shape: {df.shape}")
     return df
 
-def preprocess_data(df):
-    """Preprocess the dataframe: select features, create binary label, sample"""
+
+def to_binary_label(value):
+    """Map a dataset label (str or bytes) to 0 = normal, 1 = attack."""
+    if isinstance(value, bytes):
+        value = value.decode("utf-8", errors="ignore")
+    return 0 if str(value).strip().strip(".").lower() == "normal" else 1
+
+
+def preprocess_data(df, n_samples=10000, random_state=42):
+    """Preprocess the dataframe: select features, create binary label, sample."""
     # Select core features
     X = df[core_features].copy()
 
     # Create binary label: 0 for normal, 1 for attack
-    y = df['label'].apply(lambda x: 0 if x == 'normal' or x == b'normal.' else 1)
+    y = df['label'].apply(to_binary_label)
 
     # Combine and drop NaNs
-    df_clean = pd.concat([X, y.rename('is_attack')], axis=1).dropna()
+    df_clean = pd.concat([X, y.rename('is_attack')], axis=1).dropna().reset_index(drop=True)
 
-    # Stratified sample 10,000 rows
-    if len(df_clean) > 10000:
-        df_sampled = df_clean.groupby('is_attack', group_keys=False).apply(
-            lambda x: x.sample(n=5000, random_state=42)
-        ).sample(frac=1, random_state=42).reset_index(drop=True)
+    # Stratified sample that preserves the original class ratio.
+    # train_test_split already shuffles the rows.
+    if len(df_clean) > n_samples:
+        df_sampled = train_test_split(
+            df_clean,
+            train_size=n_samples,
+            stratify=df_clean['is_attack'],
+            random_state=random_state,
+        )[0]
     else:
-        df_sampled = df_clean.sample(n=min(10000, len(df_clean)), random_state=42).reset_index(drop=True)
+        df_sampled = df_clean
 
-    return df_sampled
+    return df_sampled.reset_index(drop=True)
+
 
 # Main execution
 if __name__ == "__main__":

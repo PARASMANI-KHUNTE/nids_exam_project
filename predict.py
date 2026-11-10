@@ -18,19 +18,20 @@ _, X_test, _, y_test = train_test_split(X, y, test_size=0.2, random_state=42, st
 # Scale test data
 X_test_scaled = scaler.transform(X_test)
 
-# Find one normal (0) and one attack (1) sample
-normal_idx = X_test[y_test == 0].index[0]
-attack_idx = X_test[y_test == 1].index[0]
+# Find one normal (0) and one attack (1) sample (positional indices)
+y_test_array = y_test.to_numpy()
+normal_pos = np.flatnonzero(y_test_array == 0)[0]
+attack_pos = np.flatnonzero(y_test_array == 1)[0]
 
 # Predict normal sample
-normal_sample = X_test_scaled[X_test.index.get_loc(normal_idx)].reshape(1, -1)
+normal_sample = X_test_scaled[normal_pos].reshape(1, -1)
 normal_pred = model.predict(normal_sample)[0]
-normal_actual = y_test.loc[normal_idx]
+normal_actual = y_test_array[normal_pos]
 
 # Predict attack sample
-attack_sample = X_test_scaled[X_test.index.get_loc(attack_idx)].reshape(1, -1)
+attack_sample = X_test_scaled[attack_pos].reshape(1, -1)
 attack_pred = model.predict(attack_sample)[0]
-attack_actual = y_test.loc[attack_idx]
+attack_actual = y_test_array[attack_pos]
 
 print("=== Live Inference Demo ===")
 print(f"\nSample 1 (Normal traffic):")

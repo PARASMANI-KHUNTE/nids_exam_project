@@ -44,8 +44,8 @@ joblib.dump(scaler, "scaler.pkl")
 | **RF Precision** | 99% (both classes) |
 | **RF Recall** | Normal: 100%, Attack: 98% |
 | **RF F1-Score** | 99% (both classes) |
-| **DL Accuracy** | 90.15% |
-| **DL Test Loss** | 0.2095 |
+| **DL Accuracy** | 90.10% |
+| **DL Test Loss** | 0.2146 |
 
 ### Feature Meanings (Network Security Context)
 
@@ -127,6 +127,7 @@ nids_exam_project/
 ├── train_ml.py                # Random Forest (99% acc)
 ├── train_dl.py                # PyTorch MLP (90% acc)
 ├── predict.py                 # Live inference demo
+├── nids_exam_notebook.ipynb   # Complete end-to-end notebook
 ├── nids_rf_model.pkl          # Trained RF model
 ├── scaler.pkl                 # Fitted StandardScaler
 ├── nids_dl_model.pth          # Trained MLP weights
