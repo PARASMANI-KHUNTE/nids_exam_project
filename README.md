@@ -26,7 +26,7 @@ python predict.py
 | Model | Accuracy | Precision | Recall | F1-Score |
 |-------|----------|-----------|--------|----------|
 | Random Forest | **99.0%** | 99% | 99% | 99% |
-| PyTorch MLP | **90.2%** | - | - | - |
+| PyTorch MLP | **90.1%** | 90% | 90% | 90% |
 
 ## Features (10 Core Network Security Features)
 
@@ -52,7 +52,9 @@ nids_exam_project/
 ├── train_ml.py                # Random Forest training (20 lines for exam)
 ├── train_dl.py                # PyTorch MLP training
 ├── predict.py                 # Live inference demo
+├── nids_exam_notebook.ipynb   # Complete end-to-end notebook
 ├── EXAM_CHEATSHEET.md         # 20-line exam code + 15 Viva Q&A
+├── requirements.txt           # Python dependencies
 ├── nids_rf_model.pkl          # Trained RF model
 ├── scaler.pkl                 # Fitted StandardScaler
 ├── nids_dl_model.pth          # Trained MLP weights
