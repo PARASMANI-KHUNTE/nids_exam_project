@@ -1,0 +1,47 @@
+﻿import pandas as pd
+import numpy as np
+import joblib
+
+# Load model and scaler
+model = joblib.load("nids_rf_model.pkl")
+scaler = joblib.load("scaler.pkl")
+
+# Load test data
+df = pd.read_csv("network_intrusion.csv")
+X = df.drop("is_attack", axis=1)
+y = df["is_attack"]
+
+# Get test indices (same split as training)
+import pandas as pd
+import numpy as np
+import joblib
+_, X_test, _, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
+
+# Scale test data
+X_test_scaled = scaler.transform(X_test)
+
+# Find one normal (0) and one attack (1) sample (positional indices)
+y_test_array = y_test.to_numpy()
+normal_pos = np.flatnonzero(y_test_array == 0)[0]
+attack_pos = np.flatnonzero(y_test_array == 1)[0]
+
+# Predict normal sample
+normal_sample = X_test_scaled[normal_pos].reshape(1, -1)
+normal_pred = model.predict(normal_sample)[0]
+normal_actual = y_test_array[normal_pos]
+
+# Predict attack sample
+attack_sample = X_test_scaled[attack_pos].reshape(1, -1)
+attack_pred = model.predict(attack_sample)[0]
+attack_actual = y_test_array[attack_pos]
+
+print("=== Live Inference Demo ===")
+print(f"\nSample 1 (Normal traffic):")
+print(f"  Predicted: {normal_pred} ({'Attack' if normal_pred else 'Normal'})")
+print(f"  Actual:    {normal_actual} ({'Attack' if normal_actual else 'Normal'})")
+print(f"  Match: {'✓' if normal_pred == normal_actual else '✗'}")
+
+print(f"\nSample 2 (Attack traffic):")
+print(f"  Predicted: {attack_pred} ({'Attack' if attack_pred else 'Normal'})")
+print(f"  Actual:    {attack_actual} ({'Attack' if attack_actual else 'Normal'})")
+print(f"  Match: {'✓' if attack_pred == attack_actual else '✗'}")
