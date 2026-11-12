@@ -1,6 +1,7 @@
 import pandas as pd
 import numpy as np
 import joblib
+from sklearn.model_selection import train_test_split
 
 # Load model and scaler
 model = joblib.load("nids_rf_model.pkl")
@@ -12,9 +13,6 @@ X = df.drop("is_attack", axis=1)
 y = df["is_attack"]
 
 # Get test indices (same split as training)
-import pandas as pd
-import numpy as np
-import joblib
 _, X_test, _, y_test = train_test_split(X, y, test_size=0.2, random_state=42, stratify=y)
 
 # Scale test data
